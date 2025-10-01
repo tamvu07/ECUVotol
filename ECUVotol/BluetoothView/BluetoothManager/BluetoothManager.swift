@@ -11,6 +11,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate {
     var centralManager: CBCentralManager!
     var peripherals: [CBPeripheral] = []
     @Published var peripheralNames: [String] = []
+    @Published var connectedPeripheral: CBPeripheral?
 
     override init() {
         super.init()
@@ -30,15 +31,56 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate {
         print("Scanning for devices...")
     }
 
-    func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
+    func connect(to peripheral: CBPeripheral) {
+        centralManager.connect(peripheral, options: nil)
+    }
+    
+    func centralManager(
+        _ central: CBCentralManager,
+        didDiscover peripheral: CBPeripheral,
+        advertisementData: [String : Any],
+        rssi RSSI: NSNumber
+    ) {
         let uuid = peripheral.identifier.uuidString
         if !peripherals.contains(peripheral) {
             self.peripherals.append(peripheral)
 
-            if let device = VTDevice(peripheral: peripheral, adv: advertisementData, RSSI: RSSI) {
+            if let device = VTDevice(
+                peripheral: peripheral,
+                adv: advertisementData,
+                RSSI: RSSI
+            ) {
                 peripheralNames.append(device.advName)
             }
         }
+    }
+    
+    func centralManager(
+        _ central: CBCentralManager,
+        didConnect peripheral: CBPeripheral
+    ) {
+        print("Connected to \(peripheral.name ?? "unknown device")")
+        connectedPeripheral = peripheral
+    }
+
+    func centralManager(
+        _ central: CBCentralManager,
+        didDisconnectPeripheral peripheral: CBPeripheral,
+        error: Error?
+    ) {
+        print("Disconnected from \(peripheral.name ?? "unknown device")")
+        if let error = error {
+            print("Error: \(error.localizedDescription)")
+        }
+        // Thiết lập lại connectedPeripheral nếu cần
+        if connectedPeripheral == peripheral {
+            connectedPeripheral = nil
+        }
+    }
+    
+    func isConnected(to peripheral: CBPeripheral) -> Bool {
+        print("a3........\(connectedPeripheral == peripheral)........connectedPeripheral is:\(connectedPeripheral)......peripheral is:\(peripheral)......")
+        return connectedPeripheral == peripheral
     }
 }
 
