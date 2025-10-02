@@ -28,6 +28,14 @@ struct BluetoothListView: View {
                 }
             }
             .navigationTitle("Bluetooth Devices")
+            .toolbar {
+                if let connectedPeripheral = viewModel.connectedPeripheral {
+                    Button("Send") {
+                        viewModel.sendData()
+                    }
+                    .disabled(connectedPeripheral == nil)
+                }
+            }
         }
         .onAppear {
             // Bắt đầu quét khi view xuất hiện

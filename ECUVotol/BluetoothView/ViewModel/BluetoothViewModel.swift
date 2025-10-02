@@ -67,5 +67,12 @@ class BluetoothViewModel: NSObject, ObservableObject, CBCentralManagerDelegate {
             print("A previously unknown state occurred.")
         }
     }
+    
+    func sendData() {
+            let dataToSend = Data([0xC9, 0x14, 0x02, 0x50, 0x01, 0x05, 0x01, 0x02,
+                                    0xD5, 0x02, 0x2B, 0x0A, 0x00, 0x38, 0x25, 0x80,
+                                    0x02, 0x0D, 0x04, 0x5F, 0x00, 0x7B, 0xCC, 0x0D])
+            bluetoothManager?.sendData(data: dataToSend)
+        }
 }
 
