@@ -121,7 +121,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         
         // Service UUID và characteristic UUID cho JDY-23
         let serviceUUID = CBUUID(string: "FFE0")
-        let characteristicUUID = CBUUID(string: "FFE2") // UUID chính xác cho characteristic
+//        let characteristicUUID = CBUUID(string: "FFE2") // UUID chính xác cho characteristic
         print("a3.....send data nha ......")
         // Khám phá dịch vụ
         peripheral.discoverServices([serviceUUID])

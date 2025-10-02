@@ -35,6 +35,10 @@ struct BluetoothListView: View {
                     }
                     .disabled(connectedPeripheral == nil)
                 }
+                // Nút để quét lại thiết bị Bluetooth
+                Button("Reload") {
+                    viewModel.startScanBluetooth() // Gọi phương thức quét lại
+                }
             }
         }
         .onAppear {
