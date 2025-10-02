@@ -11,7 +11,7 @@ import SwiftUI
 struct ECUVotolApp: App {
     var body: some Scene {
         WindowGroup {
-            BluetoothListView()
+            SplashView()
         }
     }
 }
