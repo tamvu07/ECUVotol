@@ -45,16 +45,16 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         advertisementData: [String : Any],
         rssi RSSI: NSNumber
     ) {
-        let uuid = peripheral.identifier.uuidString
         if !peripherals.contains(peripheral) {
-            self.peripherals.append(peripheral)
-
             if let device = VTDevice(
                 peripheral: peripheral,
                 adv: advertisementData,
                 RSSI: RSSI
             ) {
-                peripheralNames.append(device.advName)
+                if !device.advName.isEmpty {
+                    peripheralNames.append(device.advName)
+                    self.peripherals.append(peripheral)
+                }
             }
         }
     }
@@ -202,9 +202,9 @@ class VTDevice: NSObject {
         }
         
         // Ensure the peripheral name starts with one of the valid prefixes
-//        if !validPrefixes.contains(where: { peripheralName.hasPrefix($0) }) {
-//            return nil
-//        }
+        if !validPrefixes.contains(where: { peripheralName.hasPrefix($0) }) {
+            return nil
+        }
         
         super.init()
     }
