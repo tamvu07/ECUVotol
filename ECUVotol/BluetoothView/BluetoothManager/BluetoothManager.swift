@@ -13,9 +13,10 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     @Published var peripheralNames: [String] = []
     @Published var connectedPeripheral: CBPeripheral?
 
-    let dataToSend = Data([0xC9, 0x14, 0x02, 0x50, 0x01, 0x05, 0x01, 0x02,
-                           0xD5, 0x02, 0x2B, 0x0A, 0x00, 0x38, 0x25, 0x80,
-                           0x02, 0x0D, 0x04, 0x5F, 0x00, 0x7B, 0xCC, 0x0D])
+//    let dataToSend = Data([0xC9, 0x14, 0x02, 0x50, 0x01, 0x05, 0x01, 0x02,
+//                           0xD5, 0x02, 0x2B, 0x0A, 0x00, 0x38, 0x25, 0x80,
+//                           0x02, 0x0D, 0x04, 0x5F, 0x00, 0x7B, 0xCC, 0x0D])
+    var dataToSend = Data([0xC9])
     
     override init() {
         super.init()
@@ -88,7 +89,6 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         return connectedPeripheral == peripheral
     }
     
-    // Hàm gửi dữ liệu
 //    func sendData(data: Data) {
 //        // Đảm bảo rằng có kết nối với peripheral
 //        guard let peripheral = connectedPeripheral else {
@@ -113,14 +113,13 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
 //                }
 //            }
 //        }
-//        print("Characteristic not found or not writable.")
 //    }
     
     func sendData(data: Data) {
         guard let peripheral = connectedPeripheral else { return }
-        
+        dataToSend = data
         // Service UUID và characteristic UUID cho JDY-23
-        let serviceUUID = CBUUID(string: "FFE0")
+        let serviceUUID = CBUUID(string: "FFE2")
 //        let characteristicUUID = CBUUID(string: "FFE2") // UUID chính xác cho characteristic
         print("a3.....send data nha ......")
         // Khám phá dịch vụ
@@ -150,11 +149,8 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
                 print("Found characteristic: \(characteristic.uuid)")
 
                 // Kiểm tra quyền write
-                if characteristic.properties.contains(.write) {
-                    // Gửi dữ liệu
-//                    let dataToSend = Data([0xC9, 0x14, 0x02, 0x50, 0x01, 0x05, 0x01, 0x02,
-//                                           0xD5, 0x02, 0x2B, 0x0A, 0x00, 0x38, 0x25, 0x80,
-//                                           0x02, 0x0D, 0x04, 0x5F, 0x00, 0x7B, 0xCC, 0x0D])//Data([0x01, 0x02, 0x03]) // Dữ liệu bạn muốn gửi
+                if characteristic.uuid == CBUUID(string: "FFE2") && characteristic.properties.contains(.write) {
+                    print("a5.......0...........FFE2.....")
                     peripheral.writeValue(dataToSend, for: characteristic, type: .withResponse)
                     print("Data sent to characteristic \(characteristic.uuid)")
                 }

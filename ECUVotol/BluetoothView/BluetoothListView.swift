@@ -10,7 +10,7 @@ import CoreBluetooth
 import Lottie
 
 struct BluetoothListView: View {
-    @StateObject private var viewModel = BluetoothViewModel()
+//    @StateObject private var viewModel = BluetoothViewModel()
     @Environment(\.presentationMode) var presentationMode
     @State private var isScanning = false
     
@@ -51,8 +51,7 @@ struct BluetoothListView: View {
                 Spacer()
                 if !isScanning {
                     Button(action: {
-                        isScanning = true 
-                        viewModel.bluetoothManager?.startScanning()
+                        isScanning = true
                     }) {
                         Image("icon_stop_scan_bluetooth") // Hình ảnh logo
                             .resizable()
@@ -61,25 +60,7 @@ struct BluetoothListView: View {
                             .padding() // Màu sắc chữ trắng
                     }
                 } else {
-                    // Hiển thị danh sách thiết bị
-                    List(
-                        viewModel.peripheralNames.indices,
-                        id: \.self
-                    ) { index in
-                        Button(action: {
-                            viewModel.connectToPeripheral(at: index)
-                        }) {
-                            HStack {
-                                Text(viewModel.peripheralNames[index])
-                                if let peripheral = viewModel.bluetoothManager?.peripherals[index],
-                                   viewModel.isPeripheralConnected(peripheral) {
-                                    Text(" (Connected)")
-                                        .foregroundColor(.green)
-                                }
-                            }
-                        }
-                    }
-                    .listStyle(PlainListStyle())
+                    BluuetoothContentView()
                 }
                 
                 // Thời gian hiển thị splash screen
@@ -104,7 +85,7 @@ struct ScanSwiftUIView: View {
     }
 }
 
-//
+
 //struct BluetoothListView: View {
 //    @StateObject private var viewModel = BluetoothViewModel()
 //
