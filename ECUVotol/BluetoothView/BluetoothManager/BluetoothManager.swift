@@ -13,9 +13,9 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     @Published var peripheralNames: [String] = []
     @Published var connectedPeripheral: CBPeripheral?
 
-//    let dataToSend = Data([0xC9, 0x14, 0x02, 0x50, 0x01, 0x05, 0x01, 0x02,
-//                           0xD5, 0x02, 0x2B, 0x0A, 0x00, 0x38, 0x25, 0x80,
-//                           0x02, 0x0D, 0x04, 0x5F, 0x00, 0x7B, 0xCC, 0x0D])
+    //    let dataToSend = Data([0xC9, 0x14, 0x02, 0x50, 0x01, 0x05, 0x01, 0x02,
+    //                           0xD5, 0x02, 0x2B, 0x0A, 0x00, 0x38, 0x25, 0x80,
+    //                           0x02, 0x0D, 0x04, 0x5F, 0x00, 0x7B, 0xCC, 0x0D])
     var dataToSend = Data([0xC9])
     
     override init() {
@@ -89,45 +89,48 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         return connectedPeripheral == peripheral
     }
     
-//    func sendData(data: Data) {
-//        // Đảm bảo rằng có kết nối với peripheral
-//        guard let peripheral = connectedPeripheral else {
-//            print("No connected peripheral.")
-//            return
-//        }
-//        
-//        // Khai báo UUID cho service và characteristic
-//        let serviceUUID = CBUUID(string: "FF11") // UUID service
-//        let characteristicUUID = CBUUID(string: "FFE1") // UUID characteristic
-//
-//        // Tìm kiếm dịch vụ và characteristic
-//        for service in peripheral.services ?? [] {
-//            if service.uuid == serviceUUID {
-//                for characteristic in service.characteristics ?? [] {
-//                    if characteristic.uuid == characteristicUUID && characteristic.properties.contains(.write) {
-//                        // Gửi dữ liệu đến characteristic
-//                        peripheral.writeValue(data, for: characteristic, type: .withResponse)
-//                        print("Data sent to \(peripheral.name ?? "unknown device").")
-//                        return
-//                    }
-//                }
-//            }
-//        }
-//    }
+    //    func sendData(data: Data) {
+    //        // Đảm bảo rằng có kết nối với peripheral
+    //        guard let peripheral = connectedPeripheral else {
+    //            print("No connected peripheral.")
+    //            return
+    //        }
+    //        
+    //        // Khai báo UUID cho service và characteristic
+    //        let serviceUUID = CBUUID(string: "FF11") // UUID service
+    //        let characteristicUUID = CBUUID(string: "FFE1") // UUID characteristic
+    //
+    //        // Tìm kiếm dịch vụ và characteristic
+    //        for service in peripheral.services ?? [] {
+    //            if service.uuid == serviceUUID {
+    //                for characteristic in service.characteristics ?? [] {
+    //                    if characteristic.uuid == characteristicUUID && characteristic.properties.contains(.write) {
+    //                        // Gửi dữ liệu đến characteristic
+    //                        peripheral.writeValue(data, for: characteristic, type: .withResponse)
+    //                        print("Data sent to \(peripheral.name ?? "unknown device").")
+    //                        return
+    //                    }
+    //                }
+    //            }
+    //        }
+    //    }
     
     func sendData(data: Data) {
         guard let peripheral = connectedPeripheral else { return }
         dataToSend = data
         // Service UUID và characteristic UUID cho JDY-23
         let serviceUUID = CBUUID(string: "FFE2")
-//        let characteristicUUID = CBUUID(string: "FFE2") // UUID chính xác cho characteristic
+        //        let characteristicUUID = CBUUID(string: "FFE2") // UUID chính xác cho characteristic
         print("a3.....send data nha ......")
         // Khám phá dịch vụ
         peripheral.discoverServices([serviceUUID])
         // Sau khi khám phá, bạn cần gọi discoverCharacteristics cho mỗi service
     }
     
-    func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
+    func peripheral(
+        _ peripheral: CBPeripheral,
+        didDiscoverServices error: Error?
+    ) {
         guard error == nil else {
             print("Error discovering services: \(error!.localizedDescription)")
             return
@@ -136,33 +139,76 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         for service in peripheral.services ?? [] {
             // Khám phá các characteristic cho service
             print("Found service: \(service.uuid)")
-            peripheral.discoverCharacteristics(nil, for: service) // Khám phá characteristic cho dịch vụ
+            peripheral
+                .discoverCharacteristics(
+                    nil,
+                    for: service
+                ) // Khám phá characteristic cho dịch vụ
         }
     }
 
-    func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
+    func peripheral(
+        _ peripheral: CBPeripheral,
+        didDiscoverCharacteristicsFor service: CBService,
+        error: Error?
+    ) {
         guard error == nil else {
-            print("Error discovering characteristics: \(error!.localizedDescription)")
+            print(
+                "Error discovering characteristics: \(error!.localizedDescription)"
+            )
             return
         }
         for characteristic in service.characteristics ?? [] {
-                print("Found characteristic: \(characteristic.uuid)")
+            print("Found characteristic: \(characteristic.uuid)")
+            
+            // Kiểm tra quyền đọc
+            if characteristic.properties.contains(.read) {
+                // Đọc giá trị characteristic
+                peripheral.readValue(for: characteristic)
+            }
 
-                // Kiểm tra quyền write
-                if characteristic.uuid == CBUUID(string: "FFE2") && characteristic.properties.contains(.write) {
-                    print("a5.......0...........FFE2.....")
-                    peripheral.writeValue(dataToSend, for: characteristic, type: .withResponse)
-                    print("Data sent to characteristic \(characteristic.uuid)")
+            if characteristic.uuid == CBUUID(
+                string: "FFE1"
+            ) && characteristic.properties.contains(.notify) {
+                peripheral.setNotifyValue(true, for: characteristic)
+            }
+            
+            // Kiểm tra quyền write
+            if characteristic.uuid == CBUUID(
+                string: "FFE2"
+            ) && characteristic.properties
+                .contains(.write) {
+                print(".......write...........FFE2.....")
+                peripheral
+                    .writeValue(
+                        dataToSend,
+                        for: characteristic,
+                        type: .withResponse
+                    )
+            }
+        }
+    }
+    
+    func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+        
+        guard error == nil else {
+            print("Error updating value: \(error!.localizedDescription)")
+            return
+        }
+        
+        // Kiểm tra UUID của characteristic
+            if characteristic.uuid == CBUUID(string: "FFE1") {
+                if let data = characteristic.value {
+                    // Xử lý dữ liệu nhận được
+                    
+                    let a = BluetoothViewModel().convertDataToHexStringArray(data: data)
+                    print("a6........aaaa......Received data: \(a)")
+                    
+                    let b = BluetoothViewModel().convertDataToFormattedString(data: data)
+                    print("a7........bbbb......Received data: \(b)")
+                    
                 }
             }
-//        for characteristic in service.characteristics ?? [] {
-//            if characteristic.uuid == CBUUID(string: "FFE2") && characteristic.properties.contains(.write) {
-//                // Bây giờ bạn có thể gửi dữ liệu
-////                peripheral.writeValue(data, for: characteristic, type: .withResponse)
-//                print("Data sent to \(peripheral.name ?? "unknown device")")
-//                return
-//            }
-//        }
     }
 }
 
@@ -190,7 +236,7 @@ class VTDevice: NSObject {
         
         // Check if peripheral name starts with specific prefixes
         let validPrefixes = [
-            "JDY-23", "JDY "
+            "TXD-2", "TXD"
         ]
         
         guard let peripheralName = peripheral.name else {

@@ -70,19 +70,22 @@ class BluetoothViewModel: NSObject, ObservableObject, CBCentralManagerDelegate {
         }
     }
     
-    func sendData(value: String) {
-        guard let valueDouble = Double(value) else { return }
-        print("a3....valueDouble is:\(valueDouble).......")
+    func sendData(value1: String, value2: String) {
+        guard let value1Double = Double(value1), let value2Int = Int(value2) else { return }
+        print("a3....valueDouble is:\(value1Double).......")
         
-        let valueTemp = convertDecimalToHex(input: valueDouble) // 02 0A
-        print("a4.......valueTemp is:\(valueTemp)......")
+        let value1Temp = convertDecimalToHex(input: value1Double) // 02 0A
+        print("a4.......valueTemp is:\(value1Temp)......")
+        
         // chuyen string sang mảng
         let dataInitial = convertHexStringToArray(hexString: data1)
         print("a3.......data1 is:\(data1)......")
         
         // set gia trị mới vào mảng
-        let dataUpdateStep1 =  setDataToArrayByHexadecimal(value: valueTemp.0, index: 16, data: dataInitial)
-        let dataUpdateFinal =  setDataToArrayByHexadecimal(value: valueTemp.1, index: 17, data: dataUpdateStep1)
+        let dataUpdateStep1 =  setDataToArrayByHexadecimal(value: value1Temp.0, index: 16, data: dataInitial)
+        let dataUpdateStep2 =  setDataToArrayByHexadecimal(value: value1Temp.1, index: 17, data: dataUpdateStep1)
+        
+        let dataUpdateFinal =  setDataToArrayByHexadecimal(value: decimalToHex(decimal: value2Int), index: 30, data: dataUpdateStep1)
         
         print("a3.......dataUpdateFinal is:\(dataUpdateFinal)......")
         
@@ -151,7 +154,7 @@ class BluetoothViewModel: NSObject, ObservableObject, CBCentralManagerDelegate {
         }
     }
     
-    // nếu kiểu dữ liệu input là Hexadecimal thì cứ cho vào mảng
+    // đưa data Hẽ vao mảng
     func setDataToArrayByHexadecimal(value: String, index: Int, data: [String]) -> [String] {
         var dataTemp = data
         // Kiểm tra xem chỉ số có hợp lệ hay không
@@ -260,7 +263,24 @@ class BluetoothViewModel: NSObject, ObservableObject, CBCentralManagerDelegate {
         
         return (hHex, dHex)
     }
+    
+    // dung khi nhan data tu IC chuyen data thanh dạng ["C0", "14", "05", "52"]
+    func convertDataToHexStringArray(data: Data) -> [String] {
+        return data.map { String(format: "%02X", $0) }
+    }
+    
+    //dung khi nhan data tu IC  chuyen data thanh.dạng {C0}{14}{05}{52}{07}
+    func convertDataToFormattedString(data: Data) -> String {
+        let hexStrings = data.map { String(format: "%02X", $0) }
+        return hexStrings.map { "{\($0)}" }.joined()
+    }
+    
+    // chuyen decimal to Hex
+    func decimalToHex(decimal: Int) -> String {
+        return String(decimal, radix: 16).uppercased() // Chuyển đổi sang hex và chuyển đổi thành chữ in hoa
+    }
 }
+
 
 //["C9", "14", "02", "50", "01", "14", "04", "03", "D4", "1D", "E2", "28", "00", "0B", "25", "80", "02", "58", "04", "5F", "00", "7B", "4A", "0D", "C9", "14", "02", "50", "02", "00", "00", "3C", "41", "63", "0B", "B8", "0B", "B8", "08", "FC", "A4", "2A", "0C", "1E", "1E", "0F", "EA", "0D", "C9", "14", "02", "50", "03", "FF", "BE", "50", "64", "69", "04", "1A", "00", "14", "24", "D4", "0F", "00", "17", "19", "E9", "71", "F3", "0D", "C9", "14", "02", "50", "04", "0E", "0C", "CC", "01", "40", "03", "84", "5F", "5F", "0F", "02", "58", "0F", "A0", "00", "00", "03", "7A", "0D", "C9", "14", "02", "50", "05", "C0", "01", "C0", "00", "C0", "00", "C0", "00", "C0", "11", "C0", "05", "C0", "07", "C0", "08", "03", "93", "0D", "C9", "14", "02", "50", "06", "C0", "00", "C0", "8B", "C0", "1B", "C0", "00", "C0", "00", "C0", "14", "C1", "02", "C8", "92", "7B", "EF", "0D", "C9", "14", "02", "50", "07", "2E", "A2", "00", "E0", "50", "78", "00", "00", "00", "00", "80", "02", "58", "04", "5F", "00", "7B", "36", "0D"]......
 //
