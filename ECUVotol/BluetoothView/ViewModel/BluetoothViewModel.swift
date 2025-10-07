@@ -72,28 +72,29 @@ class BluetoothViewModel: NSObject, ObservableObject, CBCentralManagerDelegate {
     
     func sendData(value1: String, value2: String) {
         guard let value1Double = Double(value1), let value2Int = Int(value2) else { return }
-        print("a3....valueDouble is:\(value1Double).......")
         
-        let value1Temp = convertDecimalToHex(input: value1Double) // 02 0A
-        print("a4.......valueTemp is:\(value1Temp)......")
+        let value1Temp = convertDecimalToHexType10(input: value1Double) // 52.2 -> 02 0A
+        
+        let value2Temp = convertDecimalToHexTypeDefault(input: value2Int) // 300 -> 01 2C
+        
         
         // chuyen string sang mảng
         let dataInitial = convertHexStringToArray(hexString: data1)
-        print("a3.......data1 is:\(data1)......")
         
         // set gia trị mới vào mảng
         let dataUpdateStep1 =  setDataToArrayByHexadecimal(value: value1Temp.0, index: 16, data: dataInitial)
         let dataUpdateStep2 =  setDataToArrayByHexadecimal(value: value1Temp.1, index: 17, data: dataUpdateStep1)
         
-        let dataUpdateFinal =  setDataToArrayByHexadecimal(value: decimalToHex(decimal: value2Int), index: 30, data: dataUpdateStep1)
-        
-        print("a3.......dataUpdateFinal is:\(dataUpdateFinal)......")
+        let dataUpdateStep3 =  setDataToArrayByHexadecimal(value: value2Temp.0, index: 29, data: dataUpdateStep2)
+        let dataUpdateStep4 =  setDataToArrayByHexadecimal(value: value2Temp.1, index: 30, data: dataUpdateStep3)
         
         // tìm giá trị checkSum va set vao mảng
-        let dataAftercheckSum =  setDataToArrayByDecimal(value: Int(checkSumData(data: dataUpdateFinal)), index: 22, data: dataUpdateFinal)
+        let dataCheckSumPage1 =  setDataToArrayByDecimal(value: Int(checkSumData(indexStart: 0, indexEnd: 21, data: dataUpdateStep4)), index: 22, data: dataUpdateStep4)
+        
+        let dataCheckSumPage2 =  setDataToArrayByDecimal(value: Int(checkSumData(indexStart: 24, indexEnd: 45, data: dataCheckSumPage1)), index: 46, data: dataCheckSumPage1)
         
         // tach mảng ra thành các phẩn tử nhỏ
-        let chunkedData = splitArray(array: dataAftercheckSum, chunkSize: 24)
+        let chunkedData = splitArray(array: dataCheckSumPage2, chunkSize: 24)
         
         for (index, item) in chunkedData.enumerated() {
             print("a4...........................index is:\(index).............")
@@ -231,10 +232,10 @@ class BluetoothViewModel: NSObject, ObservableObject, CBCentralManagerDelegate {
         return byteArray
     }
     
-    func checkSumData(data: [String]) -> UInt8  {
-        guard let a = getSubArray(from: data, indexStart: 0, indexEnd: 21) else { return 0}
-        print("a6......a is:\(a)......")
-        guard let b = convertHexArrayToUInt8Array(hexArray: a) else { return 0} //  [UInt8]
+    // checkSum: 0 -> 21 set vao -> 22, 24 -> 45 set vao 46
+    func checkSumData(indexStart: Int, indexEnd: Int, data: [String]) -> UInt8  {
+        guard let a = getSubArray(from: data, indexStart: indexStart, indexEnd: indexEnd) else { return 0}
+        guard let b = convertHexArrayToUInt8Array(hexArray: a) else { return 0 } //  [UInt8]
 
         // Tính toán checksum
         let checksum = calcXorChecksum(buf: b)
@@ -245,10 +246,27 @@ class BluetoothViewModel: NSObject, ObservableObject, CBCentralManagerDelegate {
     }
     
     // ham 52.2 ->  Kết quả: h: 02, d: 0A
-    func convertDecimalToHex(input: Double) -> (String, String) {
+    func convertDecimalToHexType10(input: Double) -> (String, String) {
         // Nhân đầu vào với 10 để có giá trị cần tính
         let multipliedInput = input * 10
         let integerPart = Int(multipliedInput)
+        
+        // Tính giá trị cho h và d
+        let h = integerPart / 255
+        let d = integerPart % 255
+        
+        // Tính giá trị cho h
+        let hHex = String(format: "%02X", h)
+        
+        // Tính giá trị cho d
+        let dValue = integerPart - (h * 255)
+        let dHex = String(format: "%02X", dValue)
+        
+        return (hHex, dHex)
+    }
+    
+    func convertDecimalToHexTypeDefault(input: Int) -> (String, String) {
+        let integerPart = Int(input)
         
         // Tính giá trị cho h và d
         let h = integerPart / 255
