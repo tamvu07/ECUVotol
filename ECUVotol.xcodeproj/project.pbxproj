@@ -33,9 +33,22 @@
 		E8A3797A2E8D6D9500EF0893 /* ECUVotolUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ECUVotolUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		E849828D2E968F380069DA5C /* Exceptions for "ECUVotol" folder in "ECUVotol" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = E8A379622E8D6D9400EF0893 /* ECUVotol */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		E8A379652E8D6D9400EF0893 /* ECUVotol */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				E849828D2E968F380069DA5C /* Exceptions for "ECUVotol" folder in "ECUVotol" target */,
+			);
 			path = ECUVotol;
 			sourceTree = "<group>";
 		};
@@ -338,6 +351,7 @@
 				SDKROOT = iphoneos;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -393,6 +407,7 @@
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
+				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
@@ -407,6 +422,7 @@
 				DEVELOPMENT_TEAM = JLPE5BL6NP;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ECUVotol/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Onsky Dev";
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Ứng dụng này cần quyền truy cập Bluetooth để quét và kết nối với các thiết bị.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -422,6 +438,10 @@
 				MARKETING_VERSION = 1.2.25;
 				PRODUCT_BUNDLE_IDENTIFIER = com.onskyinc.healthandhome;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -438,6 +458,7 @@
 				DEVELOPMENT_TEAM = JLPE5BL6NP;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = ECUVotol/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Onsky Dev";
 				INFOPLIST_KEY_NSBluetoothAlwaysUsageDescription = "Ứng dụng này cần quyền truy cập Bluetooth để quét và kết nối với các thiết bị.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -453,6 +474,10 @@
 				MARKETING_VERSION = 1.2.25;
 				PRODUCT_BUNDLE_IDENTIFIER = com.onskyinc.healthandhome;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
