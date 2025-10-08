@@ -9,14 +9,33 @@ import Foundation
 import CoreBluetooth
 import Combine
 
+struct DataICResponse {
+    var array1: [String] = []
+    var array2: [String] = []
+    var array3: [String] = []
+    var array4: [String] = []
+    var array5: [String] = []
+    var array6: [String] = []
+    var array7: [String] = []
+    var countAllArray: Int = 0
+}
+
 class BluetoothViewModel: NSObject, ObservableObject, CBCentralManagerDelegate {
     var bluetoothManager: BluetoothManager?
     @Published var peripheralNames: [String] = []
     private var centralManager: CBCentralManager!
     @Published var connectedPeripheral: CBPeripheral?
+    var subscriptions = [AnyCancellable]()
     
     var data1 = "{C9}{14}{02}{50}{01}{14}{01}{02}{D5}{02}{2B}{0A}{00}{38}{25}{80}{02}{0A}{04}{5F}{00}{7B}{DA}{0D}{C9}{14}{02}{50}{02}{00}{00}{3C}{41}{63}{0B}{B8}{0B}{B8}{08}{FC}{A4}{2A}{0C}{1E}{1E}{0F}{EA}{0D}{C9}{14}{02}{50}{03}{FF}{BE}{50}{64}{69}{04}{1A}{00}{14}{24}{D4}{0F}{00}{17}{19}{E9}{71}{F3}{0D}{C9}{14}{02}{50}{04}{0E}{0C}{CC}{01}{40}{03}{84}{5F}{5F}{0F}{02}{58}{0F}{A0}{00}{00}{03}{7A}{0D}{C9}{14}{02}{50}{05}{C0}{01}{C0}{00}{C0}{00}{C0}{00}{C0}{11}{C0}{05}{C0}{07}{C0}{08}{03}{93}{0D}{C9}{14}{02}{50}{06}{C0}{00}{C0}{8B}{C0}{1B}{C0}{00}{C0}{00}{C0}{14}{C1}{02}{C8}{92}{7B}{EF}{0D}{C9}{14}{02}{50}{07}{2E}{A2}{00}{E0}{50}{78}{00}{00}{00}{00}{80}{02}{0A}{04}{5F}{00}{7B}{64}{0D}"
+    
+    var data = DataICResponse()
+    @Published var countArray: Int = 0
 
+    @Published var underVol: Double = 0.0
+    
+    
+    
     override init() {
         super.init()
         centralManager = CBCentralManager(delegate: self, queue: nil)
@@ -35,8 +54,11 @@ class BluetoothViewModel: NSObject, ObservableObject, CBCentralManagerDelegate {
         bluetoothManager?.$connectedPeripheral
             .assign(to: &$connectedPeripheral)
         
+        bluetoothManager?.setVM(vm: self)
         // Bắt đầu quét thiết bị
         bluetoothManager?.startScanning()
+        
+        observerData()
     }
     
     func connectToPeripheral(at index: Int) {
@@ -296,6 +318,39 @@ class BluetoothViewModel: NSObject, ObservableObject, CBCentralManagerDelegate {
     // chuyen decimal to Hex
     func decimalToHex(decimal: Int) -> String {
         return String(decimal, radix: 16).uppercased() // Chuyển đổi sang hex và chuyển đổi thành chữ in hoa
+    }
+    
+    func observerData() {
+        self.$countArray
+            .sink(receiveValue: { [weak self] result in
+                guard let strongSelf = self else { return }
+                if result == 7 {
+                    print("a3........array1 is:\(strongSelf.data.array1).....")
+                    let a = strongSelf.data.array1[16]
+                    let b = strongSelf.data.array1[17]
+                    strongSelf.underVol = strongSelf.convertHexToDecimalType10(hexString: "\(a) \(b)") ?? 0.0
+                }
+            })
+            .store(in: &subscriptions)
+    }
+    
+    // để convert data và show lên UI: "02 0A" -> 52.2
+    func convertHexToDecimalType10(hexString: String) -> Double? {
+        // Tách chuỗi hex thành các phần tử
+        let hexValues = hexString.split(separator: " ")
+
+        // Kiểm tra có đủ 2 giá trị không
+        guard hexValues.count == 2,
+              let firstValue = Int(hexValues[0], radix: 16),
+              let secondValue = Int(hexValues[1], radix: 16) else {
+            return nil // Trả về nil nếu không hợp lệ
+        }
+
+        // Tính toán giá trị
+        let result = Double(firstValue) * 255 + Double(secondValue)
+        
+        // Chia cho 10 để ra giá trị thập phân
+        return result / 10.0
     }
 }
 

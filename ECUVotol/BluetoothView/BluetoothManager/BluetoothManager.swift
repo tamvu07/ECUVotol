@@ -12,6 +12,7 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
     var peripherals: [CBPeripheral] = []
     @Published var peripheralNames: [String] = []
     @Published var connectedPeripheral: CBPeripheral?
+    var viewModel: BluetoothViewModel = BluetoothViewModel()
 
     //    let dataToSend = Data([0xC9, 0x14, 0x02, 0x50, 0x01, 0x05, 0x01, 0x02,
     //                           0xD5, 0x02, 0x2B, 0x0A, 0x00, 0x38, 0x25, 0x80,
@@ -22,7 +23,11 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
         super.init()
         centralManager = CBCentralManager(delegate: self, queue: nil)
     }
-
+    
+    func setVM(vm: BluetoothViewModel) {
+        viewModel = vm
+    }
+    
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
         if central.state == .poweredOn {
             startScanning()
@@ -201,12 +206,38 @@ class BluetoothManager: NSObject, CBCentralManagerDelegate, CBPeripheralDelegate
                 if let data = characteristic.value {
                     // Xử lý dữ liệu nhận được
                     
-                    let a = BluetoothViewModel().convertDataToHexStringArray(data: data)
-                    print("a6........aaaa......Received data: \(a)")
+                    let array = viewModel.convertDataToHexStringArray(data: data)
+                    print("a6........aaaa......Received data: \(array)")
                     
-                    let b = BluetoothViewModel().convertDataToFormattedString(data: data)
-                    print("a7........bbbb......Received data: \(b)")
-                    
+                    if array.count > 4 && array[0] == "C0" && array[1] == "14"  && array[2] == "05" {
+                        viewModel.countArray += 1
+                        viewModel.data.countAllArray = viewModel.countArray
+                        switch viewModel.countArray {
+                        case 1:
+                            viewModel.data.array1 = array
+                            break
+                        case 2:
+                            viewModel.data.array2 = array
+                            break
+                        case 3:
+                            viewModel.data.array3 = array
+                            break
+                        case 4:
+                            viewModel.data.array4 = array
+                            break
+                        case 5:
+                            viewModel.data.array5 = array
+                            break
+                        case 6:
+                            viewModel.data.array6 = array
+                            break
+                        case 7:
+                            viewModel.data.array7 = array
+                            break
+                        default:
+                            break
+                        }
+                    }
                 }
             }
     }

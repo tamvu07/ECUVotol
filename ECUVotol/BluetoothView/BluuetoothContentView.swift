@@ -34,35 +34,52 @@ struct BluuetoothContentView: View {
             }
             .listStyle(PlainListStyle())
             
+            // set value len UI
+            // Hiển thị giá trị underVol
+            Text("Under Voltage: \(viewModel.underVol, specifier: "%.2f") V")
+                .font(.headline)
+                .padding()
+            
             TextField("Under Voltage:", text: $underVolText)
-                            .padding()
-                            .background(Color.gray.opacity(0.2))
-                            .cornerRadius(8)
-                            .padding(.horizontal)
-                            .keyboardType(.numberPad)
+                .padding()
+                .background(Color.gray.opacity(0.2))
+                .cornerRadius(8)
+                .padding(.horizontal)
+                .keyboardType(.numberPad)
             
             TextField("Max curent:", text: $maxCurrentText)
-                            .padding()
-                            .background(Color.gray.opacity(0.2))
-                            .cornerRadius(8)
-                            .padding(.horizontal)
-                            .keyboardType(.numberPad)
-                            .toolbar {
-                                ToolbarItem(placement: .keyboard) {
-                                    Button("Done") {
-                                        // Dismiss the keyboard
-                                        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
-                                    }
-                                }
-                            }
+                .padding()
+                .background(Color.gray.opacity(0.2))
+                .cornerRadius(8)
+                .padding(.horizontal)
+                .keyboardType(.numberPad)
+                .toolbar {
+                    ToolbarItem(placement: .keyboard) {
+                        Button("Done") {
+                            // Dismiss the keyboard
+                            UIApplication.shared
+                                .sendAction(
+                                    #selector(UIResponder.resignFirstResponder),
+                                    to: nil,
+                                    from: nil,
+                                    for: nil
+                                )
+                        }
+                    }
+                }
             
             if let connectedPeripheral = viewModel.connectedPeripheral {
                 Button("Send") {
-                    viewModel.sendData(value1: underVolText, value2: maxCurrentText)
+                    viewModel
+                        .sendData(value1: underVolText, value2: maxCurrentText)
                 }
-                .disabled(connectedPeripheral == nil) // Vô hiệu hóa nút nếu không có thiết bị kết nối
+                .disabled(
+                    connectedPeripheral == nil
+                ) // Vô hiệu hóa nút nếu không có thiết bị kết nối
                 .frame(width: 200, height: 50) // Đặt kích thước cho nút
-                .background(connectedPeripheral == nil ? Color.gray : Color.blue) // Màu nền xanh khi có thiết bị kết nối, xám khi không
+                .background(
+                    connectedPeripheral == nil ? Color.gray : Color.blue
+                ) // Màu nền xanh khi có thiết bị kết nối, xám khi không
                 .foregroundColor(.white) // Màu chữ trắng
                 .cornerRadius(10) // Bo tròn các góc của nút
                 .font(.headline)

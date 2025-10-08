@@ -12,20 +12,20 @@ struct SplashView: View {
 
     var body: some View {
         ZStack {
-            Color.gray // Nền màu xám
+            Color.black // Nền màu xám
                 .edgesIgnoringSafeArea(.all) // Để chiếm toàn bộ màn hình
             
             if isActive {
-                HomeView() // Chuyển đến BluetoothListView khi splash screen hoàn tất
+                SplashView1() // Chuyển đến BluetoothListView khi splash screen hoàn tất
             } else {
                 VStack {
                     Spacer()
                     // Thêm logo hoặc hình ảnh nếu cần
-                    Image("ic_logo") // Hình ảnh logo
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 300, height: 300)
-                        .padding()
+//                    Image("ic_logo") // Hình ảnh logo
+//                        .resizable()
+//                        .scaledToFit()
+//                        .frame(width: 300, height: 300)
+//                        .padding()
 
                     // Thời gian hiển thị splash screen
                     Spacer() // Để căn chỉnh logo lên giữa
