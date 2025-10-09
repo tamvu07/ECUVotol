@@ -16,16 +16,16 @@ struct SplashView: View {
                 .edgesIgnoringSafeArea(.all) // Để chiếm toàn bộ màn hình
             
             if isActive {
-                SplashView1() // Chuyển đến BluetoothListView khi splash screen hoàn tất
+                HomeView() // Chuyển đến BluetoothListView khi splash screen hoàn tất
             } else {
                 VStack {
                     Spacer()
                     // Thêm logo hoặc hình ảnh nếu cần
-//                    Image("ic_logo") // Hình ảnh logo
-//                        .resizable()
-//                        .scaledToFit()
-//                        .frame(width: 300, height: 300)
-//                        .padding()
+                    Image("ic_logo") // Hình ảnh logo
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 300, height: 300)
+                        .padding()
 
                     // Thời gian hiển thị splash screen
                     Spacer() // Để căn chỉnh logo lên giữa
